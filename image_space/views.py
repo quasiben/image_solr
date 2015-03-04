@@ -13,29 +13,44 @@ from image_space.db_api import get_all_images,\
                                get_info, \
                                reset_db, \
                                get_info_serial
+from .auth import requires_auth
 import utils
 
 @app.route('/')
 @app.route('/overview')
+@requires_auth
 def overview():
     return render_template('overview.html')
 
 @app.route('/image_table')
 @app.route('/image_table/<int:page>')
+@requires_auth
 def image_table(page=0):
 
-    url = os.path.join(app.config['MEMEX_URL'],
-                             "select?q=*%3A*&start={}&rows={}"
-                             "&wt=json&indent=true".format(page, page+50))
-    r = requests.get(url)
-    solr_docs = r.json()['response']['docs']
+    url_serial = os.path.join(app.config['MEMEX_URL'],
+                             "select?q=serial_number%3A%5B*+TO+*%5D&start={}&rows={}"
+                             "&wt=json&indent=true".format(page, page+200))
+    url_camera_serial = os.path.join(app.config['MEMEX_URL'],
+                             "select?q=camera_serial_number%3A%5B*+TO+*%5D&start={}&rows={}"
+                             "&wt=json&indent=true".format(page, page+200))
+    
+    urls = [url_serial, url_camera_serial]
+    solr_docs = []
+    for url in urls:
+        r = requests.get(url)
+        solr_docs.extend(r.json()['response']['docs'])
 
     for d in solr_docs:
-        d['serial_number_solr'] = d.get("serial_number") or d.get("camera_serial_number")   # custom key for either serial_number style
-        try:
-            d['serial_number_solr'] = d['serial_number_solr'][0]
-        except TypeError:
-            d['serial_number_solr'] = ""
+        d['id'] = d['id'].strip('/')
+
+        d['serial_number'] = d.get("serial_number") or ["Missing"]
+        d['serial_number'] = d['serial_number'][0]
+
+        d['camera_serial_number'] = d.get("camera_serial_number") or ["Missing"]
+        d['camera_serial_number'] = d['camera_serial_number'][0]
+
+        d['exif_datetimeoriginal'] = d.get('exif_datetimeoriginal') or ["Missing"]
+        d['exif_datetimeoriginal'] = d['exif_datetimeoriginal'][0]
 
     return render_template('image_table.html', images=solr_docs, page=page)
 
@@ -66,10 +81,12 @@ def image_crawled(image, size=None):
         return send_from_directory(dirname, basename)
 
 @app.route('/crawled/<path:image>')
+@requires_auth
 def crawled(image):
     return image_crawled(image)
 
 @app.route('/uploaded/<image>')
+@requires_auth
 def uploaded(image):
     return image_retrieve(image)
 
@@ -81,11 +98,13 @@ def serve_upload_page():
     return render_template('upload.html', image_pages=image_pages)
 
 @app.route('/clear')
+@requires_auth
 def clear_uploads():
     clear_uploaded_images()
     return redirect(url_for('compare'))
 
 @app.route('/reset')
+@requires_auth
 def reset():
     reset_db()
     clear_uploaded_images()
@@ -93,6 +112,7 @@ def reset():
     return redirect(url_for('overview'))
 
 @app.route('/upload', methods=['GET', 'POST'])
+@requires_auth
 def upload():
     if request.method == 'GET':
         return render_template('upload.html')
@@ -120,11 +140,13 @@ def upload():
             return response
 
 @app.route('/team')
+@requires_auth
 def team():
     return render_template('team.html')
 
 @app.route('/compare')
 @app.route('/compare/<image>')
+@requires_auth
 def compare(image=None):
     if image is None:
         return serve_upload_page()

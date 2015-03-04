@@ -10,32 +10,26 @@
               <thead>
                 <tr>
                   <th>img_file</th>
-                  <th>EXIF_LSN <span class="glyphicon glyphicon-sort"></span></th>
-                  <th>MakerNote_SNF <span class="glyphicon glyphicon-sort"></span></th>
-                  <th>EXIF_BSN <span class="glyphicon glyphicon-sort"></span></th>
-                  <th>MakerNote_ISN <span class="glyphicon glyphicon-sort"></span></th>
-                  <th>MakerNote_SN <span class="glyphicon glyphicon-sort"></span></th>
-                  <th>Image_BSN <span class="glyphicon glyphicon-sort"></span></th>
+                  <th>Serial Number <span class="glyphicon glyphicon-sort"></span></th>
+                  <th>Camera Serial Number <span class="glyphicon glyphicon-sort"></span></th>
+                  <th>Date-Time<span class="glyphicon glyphicon-sort"></span></th>
                 </tr>
               </thead>
               <tbody>
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image=image['id']) }}"><img src="{{ url_for('uploaded', image=image['id']) }}" height="75" width="75" class="thumbnail" alt="{{ image['id'] }}"></a></td>
-                  <td>{{ image.EXIF_LensSerialNumber }}</td>
-                  <td>{{ image.MakerNote_SerialNumberFormat }}</td>
-                  <td>{{ image['serial_number_solr'] }}</td>
-                  <td>{{ image.MakerNote_InternalSerialNumber }}</td>
-                  <td>{{ image.MakerNote_SerialNumber }}</td>
-                  <td>{{ image.Image_BodySerialNumber }}</td>
+                  <td><a href="{{ url_for('compare', image=image['id']) }}"><img src="{{ url_for('crawled', image=image['id']) }}" height="75" width="75" class="thumbnail" alt="{{ image['id'] }}"></a></td>
+                  <td>{{ image['serial_number'] }}</td>
+                  <td>{{ image['camera_serial_number'] }}</td>
+                  <td>{{ image['exif_datetimeoriginal'] }}</td>
                 </tr>
               {% endfor %}
               </tbody>
             </table>
           </div>
 
-            Steps in size of 50
+            Steps in size of 200
             <nav>
               <ul class="pagination">
                 <li>
@@ -44,7 +38,7 @@
                   </a>
                 </li>
                 {% for n in range(5) %}
-                <li><a href="/image_table/{{ 50 * n + page}}">{{ 50 * n + page}}</a></li>
+                <li><a href="/image_table/{{ 200 * n + page}}">{{ 200 * n + page}}</a></li>
                 {% endfor %}
                 <li>
                   <a href="#" aria-label="Next">
