@@ -120,3 +120,20 @@
 .dl-horizontal dt {
   white-space: normal;
 }
+
+
+#blurdiv img {
+    -webkit-transition: all 0.5s;
+    -webkit-filter: blur(5px);
+}
+
+/*Hover effects*/
+#blurdiv img:hover {
+    -webkit-filter: none; /*Returns to default state*/
+}
+/*Default state for brightness has to be specified specifically*/
+#blurdiv img.brightness:hover {
+    -webkit-filter: brightness(0);
+}
+
+.blur {-webkit-filter: blur(3px);}

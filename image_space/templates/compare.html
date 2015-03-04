@@ -8,7 +8,9 @@
   <div class="row vertical-align clear-bottom">
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
-      <img src="{{ url_for('uploaded', image=image) }}" class="img-responsive" alt="Generic placeholder thumbnail" height="200" width="200">
+      <div id="blurdiv">
+      <img src="{{ url_for('uploaded', image=image) }}" alt="Generic placeholder thumbnail" height="200" width="200" class="img-responsive"/>
+      </div>
     </div>
     <div class="col-xs-5">
       <div>
@@ -29,7 +31,9 @@
   <div class="row">
   {% for d in solr_docs %}
        <div class="col-xs-6 col-sm-3">
+	<div id="blurdiv">
         <img src="{{ url_for('crawled', image=d['id']) }}" height="200" width="200" class="thumbnail" alt="{{ d['id'] }}">
+	</div>
         <h4>SerialNumber: {{ d['serial_number_solr'] }}</h4>
       </div>
   {% endfor %}

@@ -19,7 +19,13 @@
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image=image['id']) }}"><img src="{{ url_for('crawled', image=image['id']) }}" height="75" width="75" class="thumbnail" alt="{{ image['id'] }}"></a></td>
+                  <td>
+		     <a href="{{ url_for('compare', image=image['id']) }}">
+			<div id="blurdiv">
+			<img src="{{ url_for('crawled', image=image['id']) }}" height="75" width="75" class="thumbnail" alt="{{ image['id'] }}" class="blur"/>
+			</div>
+	             </a>
+                  </td>
                   <td>{{ image['serial_number'] }}</td>
                   <td>{{ image['camera_serial_number'] }}</td>
                   <td>{{ image['exif_datetimeoriginal'] }}</td>
