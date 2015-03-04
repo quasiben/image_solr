@@ -10,4 +10,3 @@ dependencies:
         - Flask-SQLAlchemy
         - flask-wtf
         - exifread
-        - bcrypt
