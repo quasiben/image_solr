@@ -1,0 +1,13 @@
+name: image_solr
+channels:
+    - memex
+dependencies:
+    - flask
+    - requests
+    - python
+    - pip
+    - pip:
+        - Flask-SQLAlchemy
+        - flask-wtf
+        - exifread
+        - bcrypt
