@@ -155,6 +155,8 @@ def compare(image=None):
         d['dirname'] = os.path.dirname(d['id'])
         d['basename'] = os.path.basename(d['id'])
         d['id'] = d['id'].strip('/')
+        d['serial_number_solr'] = d.get("serial_number") or d.get("camera_serial_number")   # custom key for either serial_number style
+        d['serial_number_solr'] = d['serial_number_solr'][0]
 
     # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
     return render_template('compare.html', num_images=10, image=image, exif_info=exif_info,
