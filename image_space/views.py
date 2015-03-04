@@ -125,14 +125,24 @@ def compare(image=None):
               image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
               image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
 
-    serial_num = exif_info['EXIF_BodySerialNumber']
-    
+    # serial_num = exif_info['EXIF_BodySerialNumber']
+
+    headers = {'content-type': 'image/jpeg', 'Accept': 'application/json'}
+
+    full_path = os.path.join(app.config['UPLOAD_DIR'], image)
+    url = "http://localhost:8899/meta"
+    r = requests.put(url, data=open(full_path), headers=headers)
+    json_dict = r.json()
+    serial_num = json_dict.get("Serial Number") or json_dict.get("Camera Serial Number")
+
+
     url_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=serial_number:{}&wt=json&indent=true".format(serial_num))
 
     url_camera_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=camera_serial_number:{}&wt=json&indent=true".format(serial_num))
     urls = [url_serial_number, url_camera_serial_number]
+
     solr_docs = []
     for url in urls:
         try:
