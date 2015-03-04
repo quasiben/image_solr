@@ -153,13 +153,13 @@ def compare(image=None):
 
     image_obj = get_info(image)[0]
 
-    exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
-              'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
-              'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
-
-             (image_obj.EXIF_BodySerialNumber, image_obj.EXIF_LensSerialNumber,
-              image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
-              image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
+    # exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
+    #           'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
+    #           'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
+    #
+    #          (image_obj.EXIF_BodySerialNumber, image_obj.EXIF_LensSerialNumber,
+    #           image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
+    #           image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
 
     # serial_num = exif_info['EXIF_BodySerialNumber']
 
@@ -170,7 +170,8 @@ def compare(image=None):
     r = requests.put(url, data=open(full_path), headers=headers)
     json_dict = r.json()
     serial_num = json_dict.get("Serial Number") or json_dict.get("Camera Serial Number")
-
+    exif_info = dict([(k, v) for k,v in json_dict.iteritems() if "exif" in k.lower()])
+    exif_info['exif:serial_num'] = serial_num
 
     url_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=serial_number:{}&wt=json&indent=true".format(serial_num))
@@ -194,9 +195,11 @@ def compare(image=None):
         d['serial_number_solr'] = d.get("serial_number") or d.get("camera_serial_number")   # custom key for either serial_number style
         d['serial_number_solr'] = d['serial_number_solr'][0]
 
-    # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
+    # find matches form lostcameras
+    # serial_matches = get_info_serial(serial_num)
+    lost_camera_matches = lost_camera_retreive(serial_num)
     return render_template('compare.html', num_images=10, image=image, exif_info=exif_info,
-                           solr_docs=solr_docs)
+                           solr_docs=solr_docs, lost_camera_matches=lost_camera_matches)
 
 @app.route('/analysis')
 def analysis():
