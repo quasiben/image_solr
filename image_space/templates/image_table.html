@@ -22,10 +22,10 @@
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image=image.img_file) }}"><img src="{{ url_for('uploaded', image=image['img_file']) }}" height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}"></a></td>
+                  <td><a href="{{ url_for('compare', image=image['id']) }}"><img src="{{ url_for('uploaded', image=image['id']) }}" height="75" width="75" class="thumbnail" alt="{{ image['id'] }}"></a></td>
                   <td>{{ image.EXIF_LensSerialNumber }}</td>
                   <td>{{ image.MakerNote_SerialNumberFormat }}</td>
-                  <td>{{ image.EXIF_BodySerialNumber }}</td>
+                  <td>{{ image['serial_number_solr'] }}</td>
                   <td>{{ image.MakerNote_InternalSerialNumber }}</td>
                   <td>{{ image.MakerNote_SerialNumber }}</td>
                   <td>{{ image.Image_BodySerialNumber }}</td>
@@ -34,7 +34,27 @@
               </tbody>
             </table>
           </div>
+
+            Steps in size of 50
+            <nav>
+              <ul class="pagination">
+                <li>
+                  <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {% for n in range(5) %}
+                <li><a href="/image_table/{{ 50 * n + page}}">{{ 50 * n + page}}</a></li>
+                {% endfor %}
+                <li>
+                  <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
         </div>
+
 
 
 {% endblock content %}

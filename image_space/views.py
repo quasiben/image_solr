@@ -21,9 +21,23 @@ def overview():
     return render_template('overview.html')
 
 @app.route('/image_table')
-def image_table():
-    images = get_all_images()
-    return render_template('image_table.html', images=images)
+@app.route('/image_table/<int:page>')
+def image_table(page=0):
+
+    url = os.path.join(app.config['MEMEX_URL'],
+                             "select?q=*%3A*&start={}&rows={}"
+                             "&wt=json&indent=true".format(page, page+50))
+    r = requests.get(url)
+    solr_docs = r.json()['response']['docs']
+
+    for d in solr_docs:
+        d['serial_number_solr'] = d.get("serial_number") or d.get("camera_serial_number")   # custom key for either serial_number style
+        try:
+            d['serial_number_solr'] = d['serial_number_solr'][0]
+        except TypeError:
+            d['serial_number_solr'] = ""
+
+    return render_template('image_table.html', images=solr_docs, page=page)
 
 def lost_camera_retreive(serial_num):
     camera_dir = app.config['LOST_CAMERA_DIR']
