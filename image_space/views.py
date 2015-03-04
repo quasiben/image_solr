@@ -44,9 +44,16 @@ def lost_camera_retreive(serial_num):
     return list_of_pics
 
 def image_retrieve(filename, size=None):
-        print(send_from_directory(app.config['UPLOAD_DIR'], filename))
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
+def image_crawled(image, size=None):
+        dirname = os.path.join("/", os.path.dirname(image))
+        basename = os.path.basename(image)
+        return send_from_directory(dirname, basename)
+
+@app.route('/crawled/<path:image>')
+def crawled(image):
+    return image_crawled(image)
 
 @app.route('/uploaded/<image>')
 def uploaded(image):
@@ -119,13 +126,27 @@ def compare(image=None):
               image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
 
     serial_num = exif_info['EXIF_BodySerialNumber']
-    url = os.path.join(app.config['MEMEX_URL'],
+    
+    url_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=serial_number:{}&wt=json&indent=true".format(serial_num))
-    r = requests.get(url)
-    print(url)
-    solr_docs = r.json()['response']['docs']
-    # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
 
+    url_camera_serial_number = os.path.join(app.config['MEMEX_URL'],
+                             "select?q=camera_serial_number:{}&wt=json&indent=true".format(serial_num))
+    urls = [url_serial_number, url_camera_serial_number]
+    solr_docs = []
+    for url in urls:
+        try:
+            r = requests.get(url)
+            solr_docs.extend(r.json()['response']['docs'])
+        except ValueError:
+            pass
+
+    for d in solr_docs:
+        d['dirname'] = os.path.dirname(d['id'])
+        d['basename'] = os.path.basename(d['id'])
+        d['id'] = d['id'].strip('/')
+
+    # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
     return render_template('compare.html', num_images=10, image=image, exif_info=exif_info,
                            solr_docs=solr_docs)
 
