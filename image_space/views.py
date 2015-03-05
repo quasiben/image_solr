@@ -163,7 +163,12 @@ def compare(image=None):
 
     # serial_num = exif_info['EXIF_BodySerialNumber']
 
-    headers = {'content-type': 'image/jpeg', 'Accept': 'application/json'}
+    url = "http://localhost:8899/detect/stream"
+    headers = {'Content-Disposition' : 'attachment; filename='+image, 'Accept': 'application/json'}
+    r = requests.put(url, data=open(full_path), headers=headers)
+    contentType = r.text != None ? r.text:'application/octet-stream'
+
+    headers = {'content-type': contentType 'Accept': 'application/json'}
 
     full_path = os.path.join(app.config['UPLOAD_DIR'], image)
     url = "http://localhost:8899/meta"
