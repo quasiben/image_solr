@@ -55,6 +55,8 @@ def image_table(page=0):
     return render_template('image_table.html', images=solr_docs, page=page)
 
 def lost_camera_retreive(serial_num):
+    if not serial_num:
+        return []
     camera_dir = app.config['LOST_CAMERA_DIR']
     path = os.path.join(camera_dir, serial_num)
     static_dir_path = os.path.join(os.path.dirname(__file__), "static")
@@ -169,6 +171,7 @@ def compare(image=None):
     r = requests.put(url, data=open(full_path), headers=headers)
 
     content_type = r.text if r.text else 'application/octet-stream'
+    print(content_type)
 
     headers = {'content-type': content_type,  'Accept': 'application/json'}
 
@@ -177,7 +180,7 @@ def compare(image=None):
     json_dict = r.json()
     serial_num = json_dict.get("Serial Number") or json_dict.get("Camera Serial Number")
     exif_info = dict([(k, v) for k, v in json_dict.iteritems() if "exif" in k.lower()])
-    exif_info['exif:serial_num'] = serial_num  # store serial number is key to be called by jinja
+    exif_info['exif:serial_num'] = serial_num   # store serial number is key to be called by jinja
 
     url_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=serial_number:{}&wt=json&indent=true".format(serial_num))
