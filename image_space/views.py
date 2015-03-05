@@ -152,24 +152,32 @@ def compare(image=None):
     if image is None:
         return serve_upload_page()
 
-    headers = {'content-type': 'image/jpeg', 'Accept': 'application/json'}
+    # image_obj = get_info(image)[0]
 
-    crawled_image_flag = False 
-    print(request.url_rule)
-    print(type(request.url_rule))
+    crawled_image_flag = False
+
     if "/compare/<path:image>" == str(request.url_rule):
         full_path = os.path.join("/", image)
-	crawled_image_flag = True
+        crawled_image_flag = True
     else:
         full_path = os.path.join(app.config['UPLOAD_DIR'], image)
-  
+
+    # detect file type
+    basename = os.path.basename(full_path)
+    url = "http://localhost:8899/detect/stream"
+    headers = {'Content-Disposition' : 'attachment; filename='+basename}
+    r = requests.put(url, data=open(full_path), headers=headers)
+
+    content_type = r.text if r.text else 'application/octet-stream'
+
+    headers = {'content-type': content_type,  'Accept': 'application/json'}
 
     url = "http://localhost:8899/meta"
     r = requests.put(url, data=open(full_path), headers=headers)
     json_dict = r.json()
     serial_num = json_dict.get("Serial Number") or json_dict.get("Camera Serial Number")
-    exif_info = dict([(k, v) for k,v in json_dict.iteritems() if "exif" in k.lower()])
-    exif_info['exif:serial_num'] = serial_num
+    exif_info = dict([(k, v) for k, v in json_dict.iteritems() if "exif" in k.lower()])
+    exif_info['exif:serial_num'] = serial_num  # store serial number is key to be called by jinja
 
     url_serial_number = os.path.join(app.config['MEMEX_URL'],
                              "select?q=serial_number:{}&wt=json&indent=true".format(serial_num))

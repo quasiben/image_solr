@@ -8,7 +8,7 @@ HOST = '0.0.0.0'
 PORT = 8000
 DEBUG = False
 
-UPLOAD_DIR = "/home/bzaitlen/image_solr/uploaded_images" or os.environ.get("UPLOAD_DIR")
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR") or "/home/bzaitlen/image_solr/uploaded_images"
 MEMEX_URL = os.environ.get('IMAGE_SPACE_SOLR') or "http://localhost:8081/solr/imagecatdev"
 LOGGING_FILE = "image_solr.log"
 STATIC_IMAGE_DIR = basedir+'/static/images_blurred/'
