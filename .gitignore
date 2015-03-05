@@ -54,3 +54,5 @@ docs/_build/
 target/
 
 uploaded_images/*
+image_space/static/images_blurred/
+image_space/static/lost_camera_images_blurred/
