@@ -146,26 +146,24 @@ def team():
 
 @app.route('/compare')
 @app.route('/compare/<image>')
+@app.route('/compare/<path:image>')
 @requires_auth
 def compare(image=None):
     if image is None:
         return serve_upload_page()
 
-    image_obj = get_info(image)[0]
-
-    # exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
-    #           'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
-    #           'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
-    #
-    #          (image_obj.EXIF_BodySerialNumber, image_obj.EXIF_LensSerialNumber,
-    #           image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
-    #           image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
-
-    # serial_num = exif_info['EXIF_BodySerialNumber']
-
     headers = {'content-type': 'image/jpeg', 'Accept': 'application/json'}
 
-    full_path = os.path.join(app.config['UPLOAD_DIR'], image)
+    print(image)
+    print("A"*100)
+    crawled_image_flag = False 
+    if 'data' in image:
+        full_path = os.path.join("/", image)
+	crawled_image_flag = True
+    else:
+        full_path = os.path.join(app.config['UPLOAD_DIR'], image)
+  
+
     url = "http://localhost:8899/meta"
     r = requests.put(url, data=open(full_path), headers=headers)
     json_dict = r.json()
@@ -199,7 +197,7 @@ def compare(image=None):
     # serial_matches = get_info_serial(serial_num)
     lost_camera_matches = lost_camera_retreive(serial_num)
     return render_template('compare.html', num_images=10, image=image, exif_info=exif_info,
-                           solr_docs=solr_docs, lost_camera_matches=lost_camera_matches)
+                           solr_docs=solr_docs, lost_camera_matches=lost_camera_matches, crawled_image_flag=crawled_image_flag)
 
 @app.route('/analysis')
 def analysis():

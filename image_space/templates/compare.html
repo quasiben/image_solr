@@ -9,7 +9,11 @@
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
       <div id="blurdiv">
+      {% if crawled_image_flag %}
+      <img src="{{ url_for('crawled', image=image) }}" alt="Generic placeholder thumbnail" height="200" width="200" class="img-responsive"/>
+      {% else %}
       <img src="{{ url_for('uploaded', image=image) }}" alt="Generic placeholder thumbnail" height="200" width="200" class="img-responsive"/>
+      {% endif %}
       </div>
     </div>
     <div class="col-xs-5">
