@@ -154,10 +154,10 @@ def compare(image=None):
 
     headers = {'content-type': 'image/jpeg', 'Accept': 'application/json'}
 
-    print(image)
-    print("A"*100)
     crawled_image_flag = False 
-    if 'data' in image:
+    print(request.url_rule)
+    print(type(request.url_rule))
+    if "/compare/<path:image>" == str(request.url_rule):
         full_path = os.path.join("/", image)
 	crawled_image_flag = True
     else:
